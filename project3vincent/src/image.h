@@ -1,23 +1,10 @@
-//
-// Created by 44vin on 4/9/2024.
-//
-
 #ifndef PROJECT3VINCENT_IMAGE_H
 #define PROJECT3VINCENT_IMAGE_H
 #include <vector>
 #include <fstream>
 #include <string>
 #include <iostream>
-using namespace std;
-
-struct Color{
-    unsigned char blue;
-    unsigned char green;
-    unsigned char red;
-    int blueval;
-    int greenval;
-    int redval;
-};
+#include "Color.h"
 
 class image {
 public:
@@ -35,21 +22,24 @@ public:
         char bitsPerPixel;
         char imageDescriptor;
     };
+
     image();
     image(Header head);
-    const short getHeight() const;
-    const short getWidth() const;
-    vector<Color> getPixelVec();
-    void setPixelVec(vector<Color> &vector);
-    const Color getPixel(int x) const;
     Header getHeader();
-    void loadFile(const string& filePath);
-    void createFile(const string& filePath);
+    short getHeight();
+    short getWidth();
+    std::vector<Color> getVector();
+    void setVector(std::vector<Color> &vector);
+    const Color getPixel(int x);
+    //setpixel,getVector ill write if I need to
+    void fileloader(const std::string& filePath);
+    void filemaker(const std::string& filePath);
+
 private:
-    vector<Color> pixelVec;
-    Header header;
     short width;
     short height;
+    std::vector<Color> pixelvector;
+    Header header;
 };
 
 #endif //PROJECT3VINCENT_IMAGE_H

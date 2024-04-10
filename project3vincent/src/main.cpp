@@ -1,114 +1,112 @@
 #include "image.h"
-#include "image_reader.h"
+#include "imagemodifer.h"
 
-void compare(const std::string &firstFile, const std::string &secondFile) {
-    std::ifstream first(firstFile);
-    std::ifstream second(secondFile);
-    bool same = true;
-    if (first.is_open() && second.is_open()) {
-        unsigned char value1;
-        unsigned char value2;
-        while (first >> value1 && second >> value2) {
-            if (value1 != value2) {
-                same = false;
-            }
-        }
+void test(const std::string &f1, const std::string &f2) {
+    // Open the files in binary mode
+    std::ifstream first(f1, std::ios::binary);
+    std::ifstream second(f2, std::ios::binary);
+    if (first.is_open() != true || second.is_open() != true) {
+        std::cerr << "Can't open file." << std::endl;
+        std::cout << "Failed!" << std::endl;
+        return;
     }
-    else {
-        std::cerr << "Error opening file." << std::endl;
-    }
-    if (same) {
+    std::vector<char> firstFileContent((std::istreambuf_iterator<char>(first)), std::istreambuf_iterator<char>());
+    std::vector<char> secondFileContent((std::istreambuf_iterator<char>(second)), std::istreambuf_iterator<char>());
+
+    if (firstFileContent == secondFileContent) {
         std::cout << "Passed!" << std::endl;
-    }
-    else {
+    } else {
         std::cout << "Failed!" << std::endl;
     }
 }
+
 int main() {
+    image layer1;
+    image pattern1;
+    image layer2;
+    image car;
+    image pattern2;
+    image circles;
+    image layer_red;
+    image layer_green;
+    image layer_blue;
+    image text;
+    image text2;
 
-    // Initialize files
+    layer1.fileloader("input/layer1.tga");
+    pattern1.fileloader("input/pattern1.tga");
+    layer2.fileloader("input/layer2.tga");
+    car.fileloader("input/car.tga");
+    pattern2.fileloader("input/pattern2.tga");
+    circles.fileloader("input/circles.tga");
+    layer_red.fileloader("input/layer_red.tga");
+    layer_green.fileloader("input/layer_green.tga");
+    layer_blue.fileloader("input/layer_blue.tga");
+    text.fileloader("input/text.tga");
+    text2.fileloader("input/text2.tga");
 
-    image layer1, pattern1, layer2, car, pattern2, circles, layer_red, layer_green, layer_blue, text, text2;
-    layer1.loadFile("input/layer1.tga");
-    pattern1.loadFile("input/pattern1.tga");
-    layer2.loadFile("input/layer2.tga");
-    car.loadFile("input/car.tga");
-    pattern2.loadFile("input/pattern2.tga");
-    circles.loadFile("input/circles.tga");
-    layer_red.loadFile("input/layer_red.tga");
-    layer_green.loadFile("input/layer_green.tga");
-    layer_blue.loadFile("input/layer_blue.tga");
-    text.loadFile("input/text.tga");
-    text2.loadFile("input/text2.tga");
+    std::cout << "Test #1...... ";
+    image temp = multiplyBlend(layer1, pattern1);
+    temp.filemaker("output/part1.tga");
+    test("examples/EXAMPLE_part1.tga", "output/part1.tga");
+    temp = subtractBlend(car, layer2);
+    temp.filemaker("output/part2.tga");
 
-    // Image tests
+    std::cout << "Test #2...... ";
+    test("examples/EXAMPLE_part2.tga", "output/part2.tga");
 
-
-
-    cout << "Part 1: ";
-    image temp = multiply(layer1, pattern1);
-    temp.createFile("output/part1.tga");
-    compare("examples/EXAMPLE_part1.tga", "output/part1.tga");
-    temp = subtract(car, layer2);
-    temp.createFile("output/part2.tga");
-
-    cout << "Part 2: ";
-    compare("examples/EXAMPLE_part2.tga", "output/part2.tga");
-
-    cout << "Part 3: ";
-    temp = multiply(layer1, pattern2);
+    std::cout << "Test #3...... ";
+    temp = multiplyBlend(layer1, pattern2);
     temp = screen(text, temp);
-    temp.createFile("output/part3.tga");
-    compare("output/part3.tga", "examples/EXAMPLE_part3.tga");
+    temp.filemaker("output/part3.tga");
+    test("output/part3.tga", "examples/EXAMPLE_part3.tga");
 
     // Part 4
     image temp2;
-    cout << "Part 4: ";
-    temp = multiply(layer2, circles);
-    temp2 = subtract(pattern2, temp);
-    temp2.createFile("output/part4.tga");
-    compare("output/part4.tga", "examples/EXAMPLE_part4.tga");
-
-
+    std::cout << "Test #4...... ";
+    temp = multiplyBlend(layer2, circles);
+    temp2 = subtractBlend(temp,pattern2 );
+    temp2.filemaker("output/part4.tga");
+    test("output/part4.tga", "examples/EXAMPLE_part4.tga");
 
     // Part 5
-    cout << "Part 5: ";
+    std::cout << "Test #5...... ";
     temp = overlay(layer1, pattern1);
-    temp.createFile("output/part5.tga");
-    compare("output/part5.tga", "examples/EXAMPLE_part5.tga");
+    temp.filemaker("output/part5.tga");
+    test("output/part5.tga", "examples/EXAMPLE_part5.tga");
 
-    cout << "Part 6: ";
-    temp = part6(car);
-    temp.createFile("output/part6.tga");
-    compare("output/part6.tga", "examples/EXAMPLE_part6.tga");
+    std::cout << "Test #6...... ";
+    temp = p6(car);
+    temp.filemaker("output/part6.tga");
+    test("output/part6.tga", "examples/EXAMPLE_part6.tga");
 
-    cout << "Part 7: ";
-    temp = part7(car);
-    temp.createFile("output/part7.tga");
-    compare("output/part7.tga", "examples/EXAMPLE_part7.tga");
-    temp = part8(car, "red");
-    temp.createFile("output/part8_r.tga");
-    temp = part8(car, "green");
-    temp.createFile("output/part8_g.tga");
-    temp = part8(car, "blue");
-    temp.createFile("output/part8_b.tga");
+    std::cout << "Test #7...... ";
+    temp = p7(car);
+    temp.filemaker("output/part7.tga");
+    test("output/part7.tga", "examples/EXAMPLE_part7.tga");
+    temp = p8(car, "red");
+    temp.filemaker("output/part8_r.tga");
+    temp = p8(car, "green");
+    temp.filemaker("output/part8_g.tga");
+    temp = p8(car, "blue");
+    temp.filemaker("output/part8_b.tga");
 
-    cout << "Part 8 (red): ";
-    compare("examples/EXAMPLE_part8_r.tga", "output/part8_r.tga");
-    cout << "Part 8 (green): ";
-    compare("examples/EXAMPLE_part8_g.tga", "output/part8_g.tga");
-    cout << "Part 8 (blue): ";
-    compare("examples/EXAMPLE_part8_b.tga", "output/part8_b.tga");
+    std::cout << "Test #8(red).. ";
+    test("examples/EXAMPLE_part8_r.tga", "output/part8_r.tga");
+    std::cout << "Test #8(blue). ";
+    test("examples/EXAMPLE_part8_g.tga", "output/part8_g.tga");
+    std::cout << "Test #8(green) ";
+    test("examples/EXAMPLE_part8_b.tga", "output/part8_b.tga");
 
-    cout << "Part 9: ";
-    temp = part9(layer_red, layer_green, layer_blue);
-    temp.createFile("output/part9.tga");
-    compare("output/part9.tga", "examples/EXAMPLE_part9.tga");
+    std::cout << "Test #9...... ";
+    temp = p9(layer_red, layer_green, layer_blue);
+    temp.filemaker("output/part9.tga");
+    test("output/part9.tga", "examples/EXAMPLE_part9.tga");
 
-    cout << "Part 10: ";
-    temp = part10(text2);
-    temp.createFile("output/part10.tga");
-    compare("output/part10.tga", "examples/EXAMPLE_part10.tga");
+    std::cout << "Test #10...... ";
+    temp = p10(text2);
+    temp.filemaker("output/part10.tga");
+    test("output/part10.tga", "examples/EXAMPLE_part10.tga");
 
     return 0;
 }
